@@ -63,8 +63,8 @@ public class ServerMineSweeperMultiplayer {
         }
 
         //actions handler
-        private boolean action_game_script(String input, int argument) {
-            switch(input.toLowerCase().substring(1, argument)){
+        private boolean action_game_script(String command,String argument) {
+            switch(command){
                 case "getboard":
                     for(int x = 0; x < myLobby.size; x++){
                         String info = "";
@@ -95,14 +95,14 @@ public class ServerMineSweeperMultiplayer {
             return false;
         }
 
-        private boolean action_owner_script(String input, int argument) {
+        private boolean action_owner_script(String command, String argument) {
             //if the game is not setup just yet then
             //send information about he need to send the information
             if(!myLobby.started) {
                 //set up the lobby settings
                 //and start the game when there is enough players
                 //wait for data to be retrieved
-                switch(input.toLowerCase().substring(1, argument)){
+                switch(command){
                     case "startgame":
                         System.out.println("trying to start game in lobby<" + myLobby.id + ">!");
                         if(myLobby.myUsers.size()>=myLobby.lobby_minumum){
@@ -128,11 +128,11 @@ public class ServerMineSweeperMultiplayer {
             return false;
         }
 
-        private boolean action_chat_script(String input, int argument) {
-            switch(input.toLowerCase().substring(1, argument)){
+        private boolean action_chat_script(String command, String argument) {
+            switch(command){
                 case "global": 
-                    System.out.println("sending global message by: (" + myUser.name + ") message: " + input.substring(argument, input.length()));
-                    action_send_message_global(myUser.name + ": " + input.substring(argument, input.length()));
+                    System.out.println("sending global message by: (" + myUser.name + ") message: " + argument);
+                    action_send_message_global(myUser.name + ": " + argument);
                 return true;
                 case "lobbyinfo": 
                     System.out.println("requesting lobby info by: " + myUser.name);
@@ -222,28 +222,30 @@ public class ServerMineSweeperMultiplayer {
                 //recieved actions here
                 while(keep_running){
                     String input = in.nextLine();
-                    int inp = input.indexOf(' ');
-
+                    
                     //state of the game...
                     //pre game
-                    if(input.toLowerCase().startsWith("/") && inp > 1) {
+                    if(input.toLowerCase().startsWith("/")) {
+                        int inp = input.indexOf(' ');
+                        String command = inp > 1 ? input.toLowerCase().substring(1, inp) : input.toLowerCase().substring(1, input.length());
+                        String argument = inp > 1 ? input.substring(inp+1, input.length()) : "";
+                       
                         //if any of this actions succed
                         //then continue with the next input
                         if(myLobby.started) {//accept game commands
-                            if (action_game_script(input, inp)) {continue;}
+                            if (action_game_script(command, argument)) {continue;}
                         }
                         
                         if(myLobby.owner.equals(myUser)) {//user owner commands
-                            System.out.println("in owner script part");
-                            if (action_owner_script(input, inp)) {continue;}
+                            if (action_owner_script(command, argument)) {continue;}
                         }
 
                         //look if it is a chat command
-                        if (action_chat_script(input, inp)) {continue;}
+                        if (action_chat_script(command, argument)) {continue;}
                     }
 
                     //if is not any of those then this means that we recieved a normal message
-                    action_send_message_lobby(myUser.name + ":" + input);
+                    action_send_message_lobby(myUser.name + ": " + input);
                 }
             } catch (Exception e) {
                 System.out.println(e);
