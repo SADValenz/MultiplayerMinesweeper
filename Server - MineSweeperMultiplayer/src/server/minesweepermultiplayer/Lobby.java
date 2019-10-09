@@ -120,7 +120,7 @@ public class Lobby {
                     if(check.visibility == 0){
                         check.visibility = 1;
                         check.owner = user;
-                        command_send_all("MINEREVEAL "+x+" "+y+" "+field.value+" "+field.visibility);
+                        command_send_all("CELLREVEAL "+x+" "+y+" "+field.value);
                         if(check.value == 0){
                             System.out.println("adding field: " + check.value);
                             checked.add(check);
@@ -140,12 +140,13 @@ public class Lobby {
         if(field.visibility == 0){
             field.visibility = 1;
             field.owner = user;
-            command_send_all("MINEREVEAL "+x+" "+y+" "+field.value+" "+field.visibility);
+            command_send_all("CELLREVEAL "+x+" "+y+" "+field.value);
             if(field.value==0) {
                 field_reveal_check_neighbors(user, field);
             }else if(field.value==-1) {
                 //DIE!!!!!!
                 user.active = false;
+                user.out.println("URDEAD");
                 command_send_all("MESSAGE " + user.name + " has die as virgin!");
             }
         }
@@ -157,7 +158,7 @@ public class Lobby {
         if(field.visibility == 0){
             field.visibility = 2;
             field.owner = user;
-            command_send_all("MINEFLAG "+x+" "+y+" "+field.visibility);
+            command_send_all("FLAG "+x+" "+y+" "+field.visibility);
         }
         return;
     }

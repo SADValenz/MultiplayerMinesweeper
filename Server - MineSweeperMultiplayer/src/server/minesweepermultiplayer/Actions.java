@@ -41,12 +41,10 @@ public class Actions {
         if(client.myLobby.myUsers.size()>=client.myLobby.lobby_minimum){
             client.myLobby.started = true;
             client.myLobby.open = false;
-            //for now user default settings
-            client.myLobby.set_grid_size(8);
-            client.myLobby.minecount = 6;
 
             client.myLobby.generate_new_board();
             client.action_send_message_lobby("Game Started!!!");
+            client.myLobby.command_send_all("GAMESTART");
         }else{
             client.action_send_message_lobby("Cannot start the game just yet!");
         }
@@ -56,6 +54,7 @@ public class Actions {
     public static boolean game_restart(SMM.Handler client) throws Exception {
         permission_game_start(client.myLobby);
         permission_is_owner(client.myLobby, client.myUser);
+        permission_debug();
 
         System.out.println("trying to restart game in lobby<" + client.myLobby.id + ">!");
         client.myLobby.generate_new_board();
