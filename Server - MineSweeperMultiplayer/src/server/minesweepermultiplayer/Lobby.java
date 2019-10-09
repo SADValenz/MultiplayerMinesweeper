@@ -13,8 +13,8 @@ public class Lobby {
     public int id;
     public User owner = null;
     public List<User> myUsers = new ArrayList<>();
-    public int lobby_size = 2;
-    public int lobby_minumum = 2;
+    public int lobby_size = 4;
+    public int lobby_minimum = 1;
     public boolean open = true;
     public boolean started = false;
 
@@ -109,17 +109,20 @@ public class Lobby {
         //if the value is 0... check for all the field neighbors 
         //reveal them
         List<Field> checked = new ArrayList<>();
+        System.out.println("field_reveal_check_neighbors: " + field.value);
         for(int x = -1; x <= 1; x++){
             for(int y = -1; y <= 1; y++){
                 int _x = field.x + x;
                 int _y = field.y + y;
                 if(_x >= 0 && _x < size && _y >= 0 && _y < size){
                     Field check = grid[_x][_y];
+                    System.out.println("check: (visibility:" + check.visibility + ",value:" + check.value + ")");
                     if(check.visibility == 0){
                         check.visibility = 1;
                         check.owner = user;
-                        command_send_all("MINEREVEAL "+x+" "+y+" "+field.value+" "+field.visibility);
-                        if(field.value==0){
+                        command_send_all("CELLREVEAL "+x+" "+y+" "+field.value);
+                        if(check.value == 0){
+                            System.out.println("adding field: " + check.value);
                             checked.add(check);
                         }
                     }
@@ -137,9 +140,14 @@ public class Lobby {
         if(field.visibility == 0){
             field.visibility = 1;
             field.owner = user;
-            command_send_all("MINEREVEAL "+x+" "+y+" "+field.value+" "+field.visibility);
-            if(field.value==0){
+            command_send_all("CELLREVEAL "+x+" "+y+" "+field.value);
+            if(field.value==0) {
                 field_reveal_check_neighbors(user, field);
+            }else if(field.value==-1) {
+                //DIE!!!!!!
+                user.active = false;
+                user.out.println("URDEAD");
+                command_send_all("MESSAGE " + user.name + " has die as virgin!");
             }
         }
         return;
@@ -150,7 +158,7 @@ public class Lobby {
         if(field.visibility == 0){
             field.visibility = 2;
             field.owner = user;
-            command_send_all("MINEFLAG "+x+" "+y+" "+field.visibility);
+            command_send_all("FLAG "+x+" "+y+" "+field.visibility);
         }
         return;
     }

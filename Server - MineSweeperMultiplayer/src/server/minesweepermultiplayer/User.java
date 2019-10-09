@@ -9,12 +9,12 @@ import java.util.Scanner;
  */
 public class User {
     public String name;
-    public Scanner in;
     public PrintWriter out;
+    public boolean active;
 
-    public User(String name, Scanner in, PrintWriter out) {
+    public User(String name, PrintWriter out) {
         this.name = name;
-        this.in = in;
         this.out = out;
+        this.active = true;
     }
 }
