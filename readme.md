@@ -16,13 +16,6 @@ Todos los mensajes que el server enviara al Cliente con los parámetros que este
 | GAMEEND       |                    | Termina el juego                                             |
 | URDEAD        |                    | Te dice si moriste (cuando el cliente revela una casilla con bomba) |
 
-
-
-### Cosas que faltan.
-
-1. Como pasar las calificaciones finales.
-2. Que hacer al final de la partida.
-
 ## Input
 
 Todos los comando que el server espera recibir empezaran con ` / ` , un ejemplo seria:
@@ -46,3 +39,10 @@ En el cual el servidor buscara el comando `field_reveal` y utilizara `0 0` como 
 | lobby_list    |           | Petición para recibir la lista de todos los lobbies          |
 | user_list     |           | Petición para recibir la lista de todos los jugadores del lobby |
 
+### Cosas que faltan.
+
+1. Como pasar las calificaciones finales.
+2. Que hacer al final de la partida.
+3. Mandar de quien es la bandera
+4. Limite de banderas
+5. Limitar el jugador de que lado puede empezar
