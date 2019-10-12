@@ -3,7 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Josue%20Millan/Documents/Git/MineSweeper/Server%20-%20MineSweeperMultiplayer/src/server/minesweepermultiplayer/ServerMineSweeperMultiplayer.java</file>
+            <file>file:/D:/Git/MineSweeper/Server%20-%20MineSweeperMultiplayer/src/server/minesweepermultiplayer/Actions.java</file>
+            <file>file:/D:/Git/MineSweeper/Server%20-%20MineSweeperMultiplayer/src/server/minesweepermultiplayer/SMM.java</file>
+            <file>file:/D:/Git/MineSweeper/Server%20-%20MineSweeperMultiplayer/src/server/minesweepermultiplayer/Lobby.java</file>
+            <file>file:/D:/Git/MineSweeper/Server%20-%20MineSweeperMultiplayer/src/server/minesweepermultiplayer/User.java</file>
         </group>
     </open-files>
 </project-private>
