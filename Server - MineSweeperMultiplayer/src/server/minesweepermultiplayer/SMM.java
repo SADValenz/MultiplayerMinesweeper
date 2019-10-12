@@ -31,10 +31,6 @@ public class SMM {
             }
         }
     }
-
-    public static List<Lobby> get_list() {
-        return lobbyList;
-    }
     
     public static class Handler implements Runnable {
         public User myUser = null;
@@ -71,43 +67,41 @@ public class SMM {
                     case "restart":         return Actions.game_restart(this);
                     case "board_get":       return Actions.board_get(this);
                     case "board_get_dev":   return Actions.board_get_dev(this);
-                    case "field_reveal":    return Actions.field_reveal(this, argument);
-                    case "field_flag":      return Actions.field_flag(this, argument);
+                    case "cell_reveal":     return Actions.cell_reveal(this, argument);
+                    case "cell_flag":       return Actions.cell_flag(this, argument);
                     case "global":          return Actions.chat_global(this, argument);
                     case "lobby_info":      return Actions.lobby_info(this);
                     case "lobby_list":      return Actions.lobby_list(this);
                     case "user_list":       return Actions.user_list(this);
                 }
             }catch (Exception e){
+                System.out.println("Exception " + e);
                 out.println("MESSAGE " + e.getMessage());
                 return true;
             }
             return false;
         }
-
-        public void action_send_message_lobby(String message) {
-            //send a message to the current lobby players
-            myLobby.myUsers.forEach((user) -> {
-                user.out.println("MESSAGE " + message);
-            });
-        }
-
-        public void action_send_message_global(String message) {
-            //search all active lobbies and send the message to them
-            lobbyList.forEach((lobby) -> {//iterate all lobbies
-                lobby.myUsers.forEach((user) -> {//iterate all users
-                    user.out.println("MESSAGE <Global><lobby:"+myLobby.id+"> " + message);
-                });
-            });
-        }
-
+        
         public Handler(Socket socket){
             this.socket = socket;
         }
+        
+        public String read_line(){
+            while(in.hasNextLine()){
+                return in.nextLine();
+            }
+            return "";
+        }
 
+        public void print_line(String string) {
+            out.println(string);
+            out.flush();
+        }
+        
         public void run(){
             try {
-                in = new Scanner(socket.getInputStream());
+                System.out.println("Running the socket");
+                in = new Scanner(socket.getInputStream(), "utf-8");
                 out = new PrintWriter(socket.getOutputStream(), true);
 
                 //creates the user to use
@@ -119,21 +113,27 @@ public class SMM {
                 //collect data for our user data
                 while(true){
                     out.println("SUBMITNAME");
+                    
                     myUser.name = in.nextLine();
+                    byte[] bytes = myUser.name.getBytes();
+                    for(byte bit : bytes){
+                        System.out.println(Integer.toHexString(bit));
+                    }
+                    System.out.println("Recieved: (" + myUser.name + ")");
                     if(myUser.name==null || myUser.name.isEmpty()){continue;}
                     if(myUser.name.equalsIgnoreCase("quit")){return;}
-                    //confirm name stuff
                     out.println("NAMEACCEPTED " + myUser.name);
+                    System.out.println("printed NAMEACCEPTED");
                     break;
                 }
 
                 //notify the lobby about this new player
-                action_send_message_lobby(myUser.name + " joined");
+                myLobby.send_message(myUser.name + " joined");
 
                 if(myLobby.owner == myUser){
                     //send message to owner that we have to make some stuff
                     out.println("LOBBYSETTINGS");
-                    action_send_message_lobby(myUser.name + " you are the owner of the lobby. Set the settings!!");
+                    myLobby.send_message(myUser.name + " you are the owner of the lobby. Set the settings!!");
                 }
 
                 //recieved actions here
@@ -148,7 +148,7 @@ public class SMM {
                         if (action_script(command, argument)) {continue;}
                     }
 
-                    action_send_message_lobby(myUser.name + ": " + input);
+                    myLobby.send_message(myUser.name + ": " + input);
                 }
             } catch (Exception e) {
                 System.out.println(e);
@@ -163,7 +163,7 @@ public class SMM {
                         //make the next if posible the owner
                         if(myLobby.myUsers.size() > 0){
                             myLobby.owner = myLobby.myUsers.get(0);
-                            action_send_message_lobby(myUser.name + " now is the new owner of the lobby!!!");
+                            myLobby.send_message(myUser.name + " now is the new owner of the lobby!!!");
                         }
                     }
                     
@@ -173,7 +173,7 @@ public class SMM {
                         lobbyList.remove(myLobby);
                     }else {
                         //send message to all other players if there are still players inside
-                        action_send_message_lobby(myUser.name + " has left");
+                        myLobby.send_message(myUser.name + " has left");
                     }
                 }
                 try { socket.close(); } 
