@@ -104,6 +104,13 @@ public class Actions {
         return true;
     }
 
+    public static boolean board_size(SMM.Handler client) throws Exception {
+        permission_game_start(client.myLobby);
+
+        client.out.println("SIZE " + client.myLobby.myBoard.size);
+        return true;
+    }
+
     public static boolean cell_reveal(SMM.Handler client, String argument) throws Exception {
         permission_game_start(client.myLobby);
         permission_is_alive(client.myUser);
@@ -114,15 +121,20 @@ public class Actions {
         if(argument_array.length >= 2){
             int x = 0, y = 0;
             try{
-                x = Integer.parseInt(argument_array[1]);
-                y = Integer.parseInt(argument_array[0]);
+                x = Integer.parseInt(argument_array[0]);
+                y = Integer.parseInt(argument_array[1]);
             } catch (Exception e) { throw new Exception("invalid arguments!"); }
             permission_first_cell(client.myLobby, client.myUser, x, y);
             Cell cell = client.myLobby.myBoard.get_cell(x,y);
             if( cell != null ){
                 List<Cell> cellList = cell.reveal(client.myUser);
                 cellList.forEach((cell_) -> {
-                    client.myLobby.send_command("CELLREVEAL " + cell_.x + " " + cell_.y + " " + cell_.value);
+                    client.myLobby.send_command("CELLREVEAL " + cell_.x + " " + cell_.y + " " + cell_.value + " " + client.myUser.id_game + " " + cell_.GAMEMAKER_DEPTH);
+                    if(cell_.value == -1){
+                        client.myLobby.send_message(client.myUser.name + " Has Die!!!");
+                        client.out.println("URDEAD");
+                        client.myUser.alive = false;
+                    }
                 });
             }else { throw new Exception("Coords are out of bounds!!!"); }
         }else{ throw new Exception("Not enough arguments!!"); }
@@ -139,15 +151,20 @@ public class Actions {
         if(argument_array.length >= 2){
             int x = 0, y = 0;
             try{
-                x = Integer.parseInt(argument_array[1]);
-                y = Integer.parseInt(argument_array[0]);
+                x = Integer.parseInt(argument_array[0]);
+                y = Integer.parseInt(argument_array[1]);
             } catch (Exception e) { throw new Exception("invalid arguments!"); }
             //check if inside the range
             permission_first_cell(client.myLobby, client.myUser, x, y);
             Cell cell = client.myLobby.myBoard.get_cell(x,y);
             if( cell != null ) {
                 if ( cell.set_flag(client.myUser) ) {
-                    client.myLobby.send_command("FLAG " + cell.x + " " + cell.y + " " + client.myLobby.myUsers.indexOf(client.myUser));
+                    if(cell.visibility == 2){
+                        client.myLobby.send_command("FLAG " + cell.x + " " + cell.y + " " + client.myUser.id_game);
+                    }else{
+                        client.myLobby.send_message(client.myUser.name + " Has Die!!!");
+                        client.myLobby.send_command("UNFLAG " + cell.x + " " + cell.y );
+                    }
                 }
             }else { throw new Exception("Coords are out of bounds!!!"); }
         }else{ throw new Exception("Not enough arguments!!"); }
@@ -206,6 +223,38 @@ public class Actions {
         client.myLobby.myUsers.forEach((user) ->{
             client.out.println("USERINFO " + user.id + " " + user.name + " " + user.id_game);
         });
+        return true;
+    }
+
+    public static boolean my_gameid(SMM.Handler client) throws Exception {
+        permission_game_start(client.myLobby);
+
+        client.out.println("MYGAMEID " + client.myUser.id_game);
+        return true;
+    }
+
+    public static boolean set_size(SMM.Handler client, String argument) throws Exception{
+        permission_not_game_start(client.myLobby);
+        permission_is_owner(client.myLobby, client.myUser);
+
+        String[] argument_array = null;
+        try{ argument_array  = argument.split(" "); }
+        catch (Exception e) { throw new Exception("bad request"); }
+        try{ client.myLobby.myBoard.size = Integer.parseInt(argument_array[0]); }
+        catch (Exception e) { throw new Exception("invalid arguments!"); }
+        return true;
+    }
+
+    public static boolean set_minecount(SMM.Handler client, String argument) throws Exception{
+        permission_not_game_start(client.myLobby);
+        permission_is_owner(client.myLobby, client.myUser);
+
+        String[] argument_array = null;
+        try{ argument_array  = argument.split(" "); }
+        catch (Exception e) { throw new Exception("bad request"); }
+
+        try{ client.myLobby.myBoard.minecount = Integer.parseInt(argument_array[0]); }
+        catch (Exception e) { throw new Exception("invalid arguments!"); }
         return true;
     }
 }

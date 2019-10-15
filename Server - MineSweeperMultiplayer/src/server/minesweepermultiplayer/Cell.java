@@ -25,6 +25,8 @@ public class Cell {
     public User owner = null;
     public Board board = null;
 
+    public int GAMEMAKER_DEPTH = 0;
+
     public Cell(int x, int y, Board board){
         this.x = x;
         this.y = y;
@@ -44,9 +46,10 @@ public class Cell {
                 int y_to_check = this.y + y_offset;
                 if( board.is_inside_bounds(x_to_check, y_to_check) ) {
                     Cell check = board.grid[x_to_check][y_to_check];
-                    if(check.visibility == 0){
+                    if(check.visibility == 0 || check.visibility == 2){
                         check.set_visibility(1, user);
                         revealed.add(check);
+                        check.GAMEMAKER_DEPTH = this.GAMEMAKER_DEPTH+1;
                         if(check.value == 0){ to_check.add(check); }
                     }
                 }
@@ -59,7 +62,7 @@ public class Cell {
 
     public List<Cell> reveal(User user) {
         List<Cell> revealed = new ArrayList<>();
-        if(visibility == 0){
+        if(visibility == 0 || visibility == 2 && owner != user){
             set_visibility(1, user);
             revealed.add(this);
             if(value == 0) { this.reveal_neighbors(user, revealed); }
@@ -70,6 +73,9 @@ public class Cell {
     public boolean set_flag(User user) {
         if(visibility == 0){
             set_visibility(2, user);
+            return true;
+        }else if(visibility == 2 && owner == user){
+            set_visibility(0, null);
             return true;
         }
         return false;

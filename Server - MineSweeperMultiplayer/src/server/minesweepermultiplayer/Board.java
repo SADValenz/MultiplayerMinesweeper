@@ -16,8 +16,8 @@ public class Board {
 
     public Board(){
         bombs = new ArrayList<>();
-        size = 8;
-        minecount = 10;
+        size = 10;
+        minecount = 2;
     }
 
     private int get_random_range(int i) {
@@ -53,7 +53,7 @@ public class Board {
     public void generate_new_board() {
         //check if is initializated
         if(!initializated){
-            grid_set_size(8);
+            grid_set_size(size);
         }
 
         //set mines in the field first

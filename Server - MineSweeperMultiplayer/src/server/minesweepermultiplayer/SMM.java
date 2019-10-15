@@ -67,12 +67,17 @@ public class SMM {
                     case "restart":         return Actions.game_restart(this);
                     case "board_get":       return Actions.board_get(this);
                     case "board_get_dev":   return Actions.board_get_dev(this);
+                    case "board_size":      return Actions.board_size(this);
                     case "cell_reveal":     return Actions.cell_reveal(this, argument);
                     case "cell_flag":       return Actions.cell_flag(this, argument);
                     case "global":          return Actions.chat_global(this, argument);
                     case "lobby_info":      return Actions.lobby_info(this);
                     case "lobby_list":      return Actions.lobby_list(this);
                     case "user_list":       return Actions.user_list(this);
+                    case "user_data":       return Actions.ask_player_data(this);
+                    case "my_gameid":       return Actions.my_gameid(this);
+                    case "set_size":        return Actions.set_size(this, argument);
+                    case "set_minecount":   return Actions.set_minecount(this, argument);
                 }
             }catch (Exception e){
                 System.out.println("Exception " + e);
