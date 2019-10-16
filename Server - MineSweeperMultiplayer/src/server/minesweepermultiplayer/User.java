@@ -1,7 +1,8 @@
 package server.minesweepermultiplayer;
 
 import java.io.PrintWriter;
-import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -17,11 +18,19 @@ public class User {
     public boolean alive;
     public boolean first_cell;
 
+    public List<Cell> flags;
+
     public User(String name, PrintWriter out) {
         this.id = id_counter++;
+        this.id_game = -1;
         this.name = name;
         this.out = out;
         this.alive = true;
         this.first_cell = true;
+        this.flags = new ArrayList<>();
+    }
+
+    public String info() {
+        return this.id + " " + this.name + " " + this.id_game + " " + this.alive + " " + this.flags.size(); 
     }
 }

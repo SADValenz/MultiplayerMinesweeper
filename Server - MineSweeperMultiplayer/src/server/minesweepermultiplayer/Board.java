@@ -13,6 +13,7 @@ public class Board {
     public int size;
     public int minecount;
     public boolean initializated = false;
+    public int unlocked = 0;
 
     public Board(){
         bombs = new ArrayList<>();
@@ -42,8 +43,8 @@ public class Board {
         this.size = size;
         this.grid = new Cell[size][size];
         //set correct coords to each cell
-        for(int x = 0; x < size; x++){
-            for(int y = 0; y < size; y++){
+        for(int y = 0; y < size; y++){
+            for(int x = 0; x < size; x++){
                 grid[x][y] = new Cell(x,y, this);
             }
         }
@@ -78,5 +79,41 @@ public class Board {
                 }
             }
         });
+    }
+
+    public boolean check_line(int game_id) {
+        String message = "game_id: " + game_id;
+        switch(game_id){
+            case 0: //top
+                for(int i = 0; i < size; i++){
+                    Cell check = grid[i][0];
+                    message += ", ("+ i + ", " + 0 + "= " + check.visibility + ")";
+                    if(check.visibility==0){return true;}
+                }
+            break;
+            case 1://bottom
+                for(int i = 0; i < size; i++){
+                    Cell check = grid[i][size-1];
+                    message += ", ("+ i + ", " + (size-1) + "= " + check.visibility + ")";
+                    if(check.visibility==0){return true;}
+                }
+            break;
+            case 2://right
+                for(int i = 0; i < size; i++){
+                    Cell check = grid[size-1][i];
+                    message += ", ("+ (size-1) + ", " + i + "= " + check.visibility + ")";
+                    if(check.visibility==0){return true;}
+                }
+            break;
+            case 3://left
+                for(int i = 0; i < size; i++){
+                    Cell check = grid[0][i];
+                    message += ", ("+ 0 + ", " + i + "= " + check.visibility + ")";
+                    if(check.visibility==0){return true;}
+                }
+            break;
+        }
+        System.out.println(message);
+        return false;
     }
 }

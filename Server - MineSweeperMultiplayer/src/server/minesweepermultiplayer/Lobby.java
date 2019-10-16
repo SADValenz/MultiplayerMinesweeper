@@ -28,6 +28,14 @@ public class Lobby {
         });
     }
 
+    public void send_command(String message, User self){
+        myUsers.forEach((user) ->{
+            if(!user.equals(self)){
+                user.out.println(message);
+            }
+        });
+    }
+
     public void send_message(String message){
         send_command("MESSAGE " + message);
     }
@@ -58,5 +66,38 @@ public class Lobby {
         for(User user: myUsers){
             user.id_game = i++;
         }
+    }
+
+    public boolean check_win() {
+        //first check if the 
+        boolean all_ded = true;
+        for(User user: myUsers){
+            if (user.alive) { all_ded = false; }
+        }
+
+        if(all_ded) { return true; }//the game end
+
+        boolean run_out_flags = true;
+        for(User user: myUsers){
+            if (user.flags.size() < myBoard.minecount && user.alive) { run_out_flags = false; }
+        }
+
+        if(myBoard.unlocked == (myBoard.size*myBoard.size)-myBoard.minecount){//all non mines clicked
+            //now check if the flags have run out
+            if(run_out_flags){//if there is no more flags
+                return true;//win
+            }else{//if not check that all mine block are checked
+                boolean not_visible_mines = true;
+                for(Cell cell: myBoard.bombs) {
+                    if(cell.visibility==0) { not_visible_mines = false; }
+                }
+
+                if(not_visible_mines) return true;
+            }
+        }else{
+            return false;
+        }
+
+        return false;
     }
 }

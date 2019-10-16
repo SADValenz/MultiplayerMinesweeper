@@ -65,19 +65,30 @@ public class SMM {
                 switch(command){
                     case "game_start":      return Actions.game_start(this);
                     case "restart":         return Actions.game_restart(this);
+
+                    //actions
+                    case "cell_reveal":     return Actions.cell_reveal(this, argument);
+                    case "cell_set_flag":   return Actions.cell_set_flag(this, argument);
+                    case "cell_remove_flag":return Actions.cell_remove_flag(this, argument);
+                    case "set_size":        return Actions.set_size(this, argument);
+                    case "set_minecount":   return Actions.set_minecount(this, argument);
+                    case "mouse_pos":       return Actions.mouse_pos(this, argument);
+
+                    //lobby information
+                    case "board_size":      return Actions.board_size(this);
+                    case "user_data":       return Actions.ask_player_data(this);
+
+                    //user information
+                    case "my_gameid":       return Actions.my_gameid(this);
+                    case "my_flags":        return Actions.my_flags(this);
+
+                    //chat stuff
                     case "board_get":       return Actions.board_get(this);
                     case "board_get_dev":   return Actions.board_get_dev(this);
-                    case "board_size":      return Actions.board_size(this);
-                    case "cell_reveal":     return Actions.cell_reveal(this, argument);
-                    case "cell_flag":       return Actions.cell_flag(this, argument);
-                    case "global":          return Actions.chat_global(this, argument);
                     case "lobby_info":      return Actions.lobby_info(this);
                     case "lobby_list":      return Actions.lobby_list(this);
                     case "user_list":       return Actions.user_list(this);
-                    case "user_data":       return Actions.ask_player_data(this);
-                    case "my_gameid":       return Actions.my_gameid(this);
-                    case "set_size":        return Actions.set_size(this, argument);
-                    case "set_minecount":   return Actions.set_minecount(this, argument);
+                    case "global":          return Actions.chat_global(this, argument);
                 }
             }catch (Exception e){
                 System.out.println("Exception " + e);
@@ -120,24 +131,19 @@ public class SMM {
                     out.println("SUBMITNAME");
                     
                     myUser.name = in.nextLine();
-                    byte[] bytes = myUser.name.getBytes();
-                    for(byte bit : bytes){
-                        System.out.println(Integer.toHexString(bit));
-                    }
-                    System.out.println("Recieved: (" + myUser.name + ")");
                     if(myUser.name==null || myUser.name.isEmpty()){continue;}
                     if(myUser.name.equalsIgnoreCase("quit")){return;}
-                    out.println("NAMEACCEPTED " + myUser.name);
-                    System.out.println("printed NAMEACCEPTED");
+                    out.println("NAMEACCEPTED " + myUser.name + " " + myUser.id);
                     break;
                 }
 
                 //notify the lobby about this new player
                 myLobby.send_message(myUser.name + " joined");
+                myLobby.send_command("USERINFO " + myUser.info());
 
                 if(myLobby.owner == myUser){
                     //send message to owner that we have to make some stuff
-                    out.println("LOBBYSETTINGS");
+                    out.println("OWNER");
                     myLobby.send_message(myUser.name + " you are the owner of the lobby. Set the settings!!");
                 }
 
@@ -161,6 +167,8 @@ public class SMM {
                 if( out != null || myUser != null || myLobby != null ){
                     //if we are owner remove our self from the title and 
                     //remove from the lobby
+                    //send message to everyone except me
+                    myLobby.send_command("USEREXIT " + myUser.id, myUser);
                     myLobby.remove_user(myUser);
 
                     if(myLobby.owner == myUser){
@@ -168,7 +176,8 @@ public class SMM {
                         //make the next if posible the owner
                         if(myLobby.myUsers.size() > 0){
                             myLobby.owner = myLobby.myUsers.get(0);
-                            myLobby.send_message(myUser.name + " now is the new owner of the lobby!!!");
+                            out.println("OWNER");
+                            myLobby.send_message(myLobby.owner.name + " now is the new owner of the lobby!!!");
                         }
                     }
                     

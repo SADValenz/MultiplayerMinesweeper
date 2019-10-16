@@ -62,19 +62,27 @@ public class Cell {
 
     public List<Cell> reveal(User user) {
         List<Cell> revealed = new ArrayList<>();
-        if(visibility == 0 || visibility == 2 && owner != user){
+        if(visibility == 0 || (visibility == 2 && owner != user)){
             set_visibility(1, user);
             revealed.add(this);
             if(value == 0) { this.reveal_neighbors(user, revealed); }
+            user.first_cell = false;
         }
         return revealed;
     }
 
     public boolean set_flag(User user) {
         if(visibility == 0){
+            user.flags.add(this);
             set_visibility(2, user);
             return true;
-        }else if(visibility == 2 && owner == user){
+        }
+        return false;
+    }
+
+    public boolean unset_flag(User user){
+        if(visibility == 2 && owner == user){
+            user.flags.remove(this);
             set_visibility(0, null);
             return true;
         }
