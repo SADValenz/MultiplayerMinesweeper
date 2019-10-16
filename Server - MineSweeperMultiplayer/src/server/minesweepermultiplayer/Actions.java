@@ -85,7 +85,7 @@ public class Actions {
 
             client.myLobby.myBoard.generate_new_board();
             client.myLobby.send_message("Game Started!!!");
-            client.myLobby.send_command("GAMESTART");
+            client.myLobby.send_command("GAMESTART " + myLobby.myBoard.size + " " + myLobby.myBoard.minecount);
         }else{
             client.myLobby.send_message("Cannot start the game just yet!");
         }
