@@ -71,7 +71,11 @@ public class SMM {
                     case "cell_set_flag":   return Actions.cell_set_flag(this, argument);
                     case "cell_remove_flag":return Actions.cell_remove_flag(this, argument);
                     case "set_size":        return Actions.set_size(this, argument);
+                    case "size_add":        return Actions.set_size(this, "" + (myLobby.myBoard.size+1));
+                    case "size_subtract":   return Actions.set_size(this, "" + (myLobby.myBoard.size-1));
                     case "set_minecount":   return Actions.set_minecount(this, argument);
+                    case "mine_add":        return Actions.set_minecount(this, "" + (myLobby.myBoard.minecount+1));
+                    case "mine_subtract":   return Actions.set_minecount(this, "" + (myLobby.myBoard.minecount-1));
                     case "mouse_pos":       return Actions.mouse_pos(this, argument);
 
                     //lobby information
@@ -134,6 +138,8 @@ public class SMM {
                     if(myUser.name==null || myUser.name.isEmpty()){continue;}
                     if(myUser.name.equalsIgnoreCase("quit")){return;}
                     out.println("NAMEACCEPTED " + myUser.name + " " + myUser.id);
+                    out.println("SIZE " + myLobby.myBoard.size);
+                    out.println("MINECOUNT " + myLobby.myBoard.minecount);
                     break;
                 }
 
@@ -144,7 +150,9 @@ public class SMM {
                 if(myLobby.owner == myUser){
                     //send message to owner that we have to make some stuff
                     out.println("OWNER");
-                    myLobby.send_message(myUser.name + " you are the owner of the lobby. Set the settings!!");
+                    myLobby.send_message(myUser.name + " Is the owner of the lobby. Set the settings!!");
+                }else{
+                    out.println("NOTOWNER");
                 }
 
                 //recieved actions here

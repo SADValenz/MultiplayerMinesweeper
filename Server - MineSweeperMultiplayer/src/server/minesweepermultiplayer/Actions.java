@@ -85,7 +85,7 @@ public class Actions {
 
             client.myLobby.myBoard.generate_new_board();
             client.myLobby.send_message("Game Started!!!");
-            client.myLobby.send_command("GAMESTART " + myLobby.myBoard.size + " " + myLobby.myBoard.minecount);
+            client.myLobby.send_command("GAMESTART " + client.myLobby.myBoard.size + " " + client.myLobby.myBoard.minecount);
         }else{
             client.myLobby.send_message("Cannot start the game just yet!");
         }
@@ -315,6 +315,12 @@ public class Actions {
         //check to be inside the aceptable ranges
         if(size > 2 && size < 18){
             client.myLobby.myBoard.size = size;
+            client.myLobby.send_command("SIZE " + size);
+            //correct number of mines in this case
+            if(client.myLobby.myBoard.minecount >= client.myLobby.myBoard.size*client.myLobby.myBoard.size){
+                client.myLobby.myBoard.minecount = client.myLobby.myBoard.size*client.myLobby.myBoard.size-1;
+                client.myLobby.send_command("MINECOUNT " + client.myLobby.myBoard.minecount);
+            }
         }else{
             throw new Exception("size not in range: (2 > n < 18)");
         }
@@ -332,8 +338,9 @@ public class Actions {
         try{ mine = Integer.parseInt(argument_array[0]); }
         catch (Exception e) { throw new Exception("invalid arguments!"); }
 
-        if(mine > 0 && mine < client.myLobby.myBoard.size){
+        if(mine > 0 && mine < client.myLobby.myBoard.size*client.myLobby.myBoard.size){
             client.myLobby.myBoard.minecount = mine;
+            client.myLobby.send_command("MINECOUNT " + mine);
         }else{
             throw new Exception("mine must be more than 1 and less than the board size!");
         }
