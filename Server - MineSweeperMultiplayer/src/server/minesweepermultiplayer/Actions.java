@@ -53,12 +53,12 @@ public class Actions {
                     }
                 break;
                 case 2: 
-                    if(!(y>0 && y<lobby.myBoard.size && x==0)){
+                    if(!(y>0 && y<lobby.myBoard.size && x==lobby.myBoard.size-1)){
                         throw new Exception("not your section... just yet!");
                     }
                 break;
                 case 3:
-                    if(!(y>0 && y<lobby.myBoard.size && x==lobby.myBoard.size-1)){
+                    if(!(y>0 && y<lobby.myBoard.size && x==0)){
                         throw new Exception("not your section... just yet!");
                     }
                 break;
