@@ -162,17 +162,15 @@ public class Actions {
                 List<Cell> cellList = cell.reveal(client.myUser);
                 cellList.forEach((cell_) -> {
                     client.myLobby.send_command("CELLREVEAL " + cell_.x + " " + cell_.y + " " + cell_.value + " " + client.myUser.id_game + " " + cell_.GAMEMAKER_DEPTH);
-                    if(cell_.value == -1){
+                    if(cell_.value == -1){//if mine kill the player
                         client.myUser.alive = false;
-                        client.myLobby.send_message(client.myUser.name + " Has Die!!!");
                         client.out.println("URDEAD");
                         client.myLobby.send_command("USERINFO " + client.myUser.info());
-                    }else{
-                        //add to the counter
-                        client.myLobby.myBoard.unlocked++;
-                        //check for win
-                    }
-                    if(client.myLobby.check_win()){ client.myLobby.send_command("GAMEEND"); }   
+                        client.myLobby.send_message(client.myUser.name + " Has Die!!!");
+                    }else{ client.myLobby.myBoard.unlocked++; }//add to the counter
+                   //check for win
+                    if(client.myLobby.check_win()){ client.myLobby.send_command("GAMEEND"); } 
+
                     ///Check for soflock
                     client.myLobby.myUsers.forEach((user) ->{
                         if(user.first_cell){
@@ -181,7 +179,6 @@ public class Actions {
                             }
                         }
                     });
-                    
                 });
             }else { throw new Exception("Coords are out of bounds!!!"); }
         }else{ throw new Exception("Not enough arguments!!"); }

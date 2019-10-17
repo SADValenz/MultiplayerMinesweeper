@@ -64,9 +64,10 @@ public class Cell {
         List<Cell> revealed = new ArrayList<>();
         System.out.println("check visibility and owner stuff");
         System.out.println("visibility: " + visibility + ", owner: " + (owner != null ? owner.id : "none") + ", user: " + user.id);
-        if(visibility == 0 || (visibility == 2 && !owner.equals(user))){
+        if( visibility == 0 || (visibility == 2 && !owner.equals(user)) ){
             set_visibility(1, user);
             revealed.add(this);
+
             if(value == 0) { this.reveal_neighbors(user, revealed); }
             user.first_cell = false;
         }
