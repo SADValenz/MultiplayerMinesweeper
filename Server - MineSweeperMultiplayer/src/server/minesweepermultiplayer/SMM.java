@@ -133,8 +133,9 @@ public class SMM {
                 //collect data for our user data
                 while(true){
                     out.println("SUBMITNAME");
-                    
+                    System.out.println("ESPERANDO NOMBRE:");
                     myUser.name = in.nextLine();
+                    System.out.println(myUser.name);
                     if(myUser.name==null || myUser.name.isEmpty()){continue;}
                     if(myUser.name.equalsIgnoreCase("quit")){return;}
                     out.println("NAMEACCEPTED " + myUser.name + " " + myUser.id);

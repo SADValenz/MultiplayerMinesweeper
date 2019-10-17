@@ -33,4 +33,16 @@ public class User {
     public String info() {
         return this.id + " " + this.name + " " + this.id_game + " " + this.alive + " " + this.flags.size(); 
     }
+
+    public int get_score() {
+        int score = 0;
+        for(Cell flag : flags){
+            if(flag.visibility == 2 || flag.visibility == 1){
+                score++;
+            }else{
+                score--;
+            }
+        }
+        return score;
+    }
 }

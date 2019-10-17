@@ -169,7 +169,7 @@ public class Actions {
                         client.myLobby.send_message(client.myUser.name + " Has Die!!!");
                     }else{ client.myLobby.myBoard.unlocked++; }//add to the counter
                    //check for win
-                    if(client.myLobby.check_win()){ client.myLobby.send_command("GAMEEND"); } 
+                    if(client.myLobby.check_win()){ client.myLobby.game_end(); } 
 
                     ///Check for soflock
                     client.myLobby.myUsers.forEach((user) ->{
@@ -205,7 +205,7 @@ public class Actions {
             if( cell != null ) {
                 if ( cell.set_flag(client.myUser) ) {
                     client.myLobby.send_command("FLAG " + cell.x + " " + cell.y + " " + client.myUser.id_game);
-                    if(client.myLobby.check_win()){ client.myLobby.send_command("GAMEEND"); }
+                    if(client.myLobby.check_win()){ client.myLobby.game_end(); }
                 }
             }else { throw new Exception("Coords are out of bounds!!!"); }
         }else{ throw new Exception("Not enough arguments!!"); }

@@ -68,6 +68,15 @@ public class Lobby {
         }
     }
 
+    public void game_end(){
+        String args = "";
+        for(User user : myUsers){
+            args += user.id_game+":"+user.get_score()+":"+ user.name + " ";
+        }
+
+        send_command("GAMEEND " + args);
+    }
+
     public boolean check_win() {
         //first check if the 
         boolean all_ded = true;
