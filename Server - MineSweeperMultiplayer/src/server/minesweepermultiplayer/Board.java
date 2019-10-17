@@ -17,8 +17,8 @@ public class Board {
 
     public Board(){
         bombs = new ArrayList<>();
-        size = 10;
-        minecount = 2;
+        size = 24;
+        minecount = 18;
     }
 
     private int get_random_range(int i) {
