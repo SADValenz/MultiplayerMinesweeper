@@ -40,24 +40,27 @@ public class Cell {
 
     public void reveal_neighbors(User user, List<Cell> revealed) {
         List<Cell> to_check = new ArrayList<>();
-        for(int x_offset = -1; x_offset <= 1; x_offset++){
-            for(int y_offset = -1; y_offset <= 1; y_offset++){
-                int x_to_check = this.x + x_offset;
-                int y_to_check = this.y + y_offset;
-                if( board.is_inside_bounds(x_to_check, y_to_check) ) {
-                    Cell check = board.grid[x_to_check][y_to_check];
-                    if(check.visibility == 0 || check.visibility == 2){
-                        check.set_visibility(1, user);
-                        revealed.add(check);
-                        check.GAMEMAKER_DEPTH = this.GAMEMAKER_DEPTH+1;
-                        if(check.value == 0){ to_check.add(check); }
-                    }
-                }
+
+        List<Cell> neighbors = board.get_neighbors_cells(this);
+
+        neighbors.forEach((neighbor) -> {
+            if(neighbor.visibility == 0 || neighbor.visibility == 2){
+                neighbor.set_visibility(1, user);
+                revealed.add(neighbor);
+                neighbor.GAMEMAKER_DEPTH = this.GAMEMAKER_DEPTH+1;
+                if(neighbor.value == 0){ to_check.add(neighbor); }
             }
-        }
+        });
+
         to_check.forEach((check) ->{//do the same operation to all other founded 0 value fields
             check.reveal_neighbors(user, revealed);
         });
+    }
+
+    public void update_number() {
+        if(value != -1){
+            value++;
+        }
     }
 
     public List<Cell> reveal(User user) {

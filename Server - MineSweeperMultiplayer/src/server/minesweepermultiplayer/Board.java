@@ -8,6 +8,9 @@ import java.util.List;
  * @author Josue Millan
  */
 public class Board {
+    public static int size_min = 2;
+    public static int size_max = 30;
+
     public Cell[][] grid;
     public List<Cell> bombs;
     public int size;
@@ -17,11 +20,12 @@ public class Board {
 
     public Board(){
         bombs = new ArrayList<>();
-        size = 24;
-        minecount = 18;
+        //default values
+        size = 8;
+        minecount = 5;
     }
 
-    private int get_random_range(int i) {
+    public int get_random_range(int i) {
         double randomDouble = Math.random();
         randomDouble = randomDouble * i;
         int randomInt = (int) randomDouble;
@@ -29,14 +33,11 @@ public class Board {
     }
 
     public boolean is_inside_bounds(int x, int y) {
-        return (x >= 0 && x < size) &&  (y >= 0 && y < size);
+        return (x >= 0 && x < size) && (y >= 0 && y < size);
     }
 
     public Cell get_cell(int x, int y) {
-        if( is_inside_bounds(x,y) ){
-            return grid[x][y];
-        }
-        return null;
+        return is_inside_bounds(x,y) ? grid[x][y] : null;
     }
 
     public void grid_set_size(int size) {
@@ -48,37 +49,53 @@ public class Board {
                 grid[x][y] = new Cell(x,y, this);
             }
         }
-        return;
+    }
+
+    public Cell generate_new_bomb() {
+        while(true) {
+            int x = get_random_range(size);
+            int y = get_random_range(size);
+            Cell cell = grid[x][y];
+            if(cell.value != -1 && cell.visibility != 1){ //if it can get in because if it is a bomb... retry again
+                cell.value = -1; 
+                return cell;
+            }
+        }
+    }
+
+    public List<Cell> get_neighbors_cells(Cell cell) {
+        List<Cell> neighbors = new ArrayList<>();
+        for(int x = -1; x <= 1; x++){
+            for(int y = -1; y <= 1; y++){
+                Cell neighbor = get_cell(cell.x-x, cell.y-y);
+                if(neighbor != null && !cell.equals(neighbor)){
+                    neighbors.add(neighbor);
+                }
+            }
+        }
+        return neighbors;
     }
 
     public void generate_new_board() {
         //check if is initializated
-        if(!initializated){
-            grid_set_size(size);
-        }
+        if(!initializated){ grid_set_size(size); }
 
         //set mines in the field first
         for (int mine = 0; mine < minecount ; mine++ ) {
-            int x = get_random_range(size);
-            int y = get_random_range(size);
-            Cell field = grid[x][y];
-            if(field.value != -1){field.value = -1; bombs.add(field);}
-            else{mine--;} //if failed to put a mine in the cell, try again
+            bombs.add(generate_new_bomb());
         }
 
         //now with the bomb list update the neighbors cell mine count
         bombs.forEach((bomb) -> {
-            for(int x = -1; x <= 1; x++){
-                for(int y = -1; y <= 1; y++){
-                    int _x = bomb.x + x;
-                    int _y = bomb.y + y;
-                    if( is_inside_bounds(_x, _y) ){
-                        Cell check = grid[_x][_y];
-                        if(check.value != -1){ check.value++; }
-                    }
-                }
-            }
+            List<Cell> neighbors = get_neighbors_cells(bomb);
+            neighbors.forEach((neighbor) -> {
+                neighbor.update_number();
+            });
         });
+    }
+
+    public int get_total_size() {
+        return size*size;
     }
 
     public boolean check_line(int game_id) {

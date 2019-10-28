@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 /**
  *
  * @author Josue Millan
@@ -20,9 +21,9 @@ public class SMM {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
-        // TODO code application logic here
         System.out.println("the chat is running now!");
-        //for now just test table generation 
+
+        Actions.initialize();
         
         ExecutorService pool = Executors.newFixedThreadPool(500);
         try(ServerSocket listener = new ServerSocket(59001)){
@@ -61,45 +62,20 @@ public class SMM {
 
         //actions handler
         private boolean action_script(String command, String argument) {
-            try {
-                switch(command){
-                    case "game_start":      return Actions.game_start(this);
-                    case "restart":         return Actions.game_restart(this);
 
-                    //actions
-                    case "cell_reveal":     return Actions.cell_reveal(this, argument);
-                    case "cell_set_flag":   return Actions.cell_set_flag(this, argument);
-                    case "cell_remove_flag":return Actions.cell_remove_flag(this, argument);
-                    case "set_size":        return Actions.set_size(this, argument);
-                    case "size_add":        return Actions.set_size(this, "" + (myLobby.myBoard.size+1));
-                    case "size_subtract":   return Actions.set_size(this, "" + (myLobby.myBoard.size-1));
-                    case "set_minecount":   return Actions.set_minecount(this, argument);
-                    case "mine_add":        return Actions.set_minecount(this, "" + (myLobby.myBoard.minecount+1));
-                    case "mine_subtract":   return Actions.set_minecount(this, "" + (myLobby.myBoard.minecount-1));
-                    case "mouse_pos":       return Actions.mouse_pos(this, argument);
-
-                    //lobby information
-                    case "board_size":      return Actions.board_size(this);
-                    case "user_data":       return Actions.ask_player_data(this);
-
-                    //user information
-                    case "my_gameid":       return Actions.my_gameid(this);
-                    case "my_flags":        return Actions.my_flags(this);
-
-                    //chat stuff
-                    case "board_get":       return Actions.board_get(this);
-                    case "board_get_dev":   return Actions.board_get_dev(this);
-                    case "lobby_info":      return Actions.lobby_info(this);
-                    case "lobby_list":      return Actions.lobby_list(this);
-                    case "user_list":       return Actions.user_list(this);
-                    case "global":          return Actions.chat_global(this, argument);
+            for(Command action : Actions.myCommands){
+                if (action.com().equals(command)){
+                    try{
+                        action.exec(this, argument);
+                    }catch (Exception e){
+                        System.out.println("Exception " + e);
+                        out.println("MESSAGE " + e.getMessage());
+                    }
+                    return true;
                 }
-            }catch (Exception e){
-                System.out.println("Exception " + e);
-                out.println("MESSAGE " + e.getMessage());
-                return true;
             }
             return false;
+            
         }
         
         public Handler(Socket socket){
@@ -194,13 +170,16 @@ public class SMM {
                     if(myLobby.myUsers.isEmpty()){
                         //destroy lobby since there is no more players in it
                         lobbyList.remove(myLobby);
+                        //if timer is alive try to purgate it
+                        myLobby.timer.cancel();
+                        myLobby.timer.purge();
                     }else {
                         //send message to all other players if there are still players inside
                         myLobby.send_message(myUser.name + " has left");
                     }
                 }
                 try { socket.close(); } 
-                catch (Exception e) { }
+                catch (IOException e) { }
             }
         }
     }
